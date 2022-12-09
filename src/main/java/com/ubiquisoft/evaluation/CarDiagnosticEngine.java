@@ -5,10 +5,13 @@ import com.ubiquisoft.evaluation.domain.ConditionType;
 import com.ubiquisoft.evaluation.domain.Part;
 import com.ubiquisoft.evaluation.domain.PartType;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class CarDiagnosticEngine {
 
@@ -39,6 +42,81 @@ public class CarDiagnosticEngine {
 		 * console output is as least as informative as the provided methods.
 		 */
 
+		Boolean allValid = true;
+        
+		for(int i = 0; i < 3; i++){
+			if(i == 0){
+				if(!validateDataFields(car)){
+					allValid = false;
+					System.out.println("Data Field missing.");	
+					break;
+				}
+			}
+			if(i == 1){
+				if(!validateParts(car)){
+					allValid = false;
+					System.out.println("Parts missing.");	
+					break;
+				}
+			}
+			if(i == 2){
+				if(!validatePartsCondition(car)){
+					allValid = false;
+					System.out.println("Parts are in bad condition.");
+					break;
+				}
+			}
+		}
+		if(allValid){
+			System.out.println("Validation has succeeded! You're good to go!");	
+		}
+		else{
+			System.out.println("Validation has failed! Your car needs more work!");	
+		}
+		
+
+	}
+    
+	private boolean validateDataFields(Car car){
+		List<Boolean> validFields = new ArrayList<Boolean>();
+		validFields.add(printMissingDataField(car.getMake(), "MAKE"));
+		validFields.add(printMissingDataField(car.getModel(), "MODEL"));
+		validFields.add(printMissingDataField(car.getYear(), "YEAR"));
+		for(Boolean field : validFields){
+			if(field == false){
+				return false;
+			}
+		}
+        return true;
+	}
+
+	private boolean validateParts(Car car){
+		boolean valid = true;
+		for (Map.Entry<PartType, Integer> missingPart : car.getMissingPartsMap().entrySet()){
+			valid = false;
+			printMissingPart(missingPart.getKey(), missingPart.getValue());
+		} 
+        return valid;
+	}
+
+	private boolean validatePartsCondition(Car car){
+		boolean valid = true;
+		for(Part part : car.getParts()){
+			if(!part.isInWorkingCondition()){
+				valid = false;
+				printDamagedPart(part.getType(), part.getCondition());
+			}
+		}
+        return valid;
+	}
+	private boolean printMissingDataField(String dataField, String field) {
+		if (dataField == null) {
+			System.out.println(String.format("Missing Data Field Detected: %s ", field));
+			return false;
+		}
+		else{
+			return true;
+		}
 
 	}
 

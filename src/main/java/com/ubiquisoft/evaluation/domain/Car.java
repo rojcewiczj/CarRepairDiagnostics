@@ -1,10 +1,13 @@
 package com.ubiquisoft.evaluation.domain;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -30,8 +33,29 @@ public class Car {
 		 *          "TIRE": 3
 		 *      }
 		 */
-
-		return null;
+        
+         Map<PartType, Integer> missingParts = new HashMap<PartType, Integer>();
+         missingParts.put(PartType.ENGINE, 1);
+         missingParts.put(PartType.ELECTRICAL, 1);
+         missingParts.put(PartType.FUEL_FILTER, 1);
+         missingParts.put(PartType.OIL_FILTER, 1);
+         missingParts.put(PartType.TIRE, 4);
+     
+        for(Part part: parts){
+        
+        	if(missingParts.containsKey(part.getType())){
+            
+           		missingParts.put(part.getType(), missingParts.get(part.getType()) - 1);
+                
+                if(missingParts.get(part.getType()) == 0){ 
+                
+                  missingParts.remove(part.getType());
+                  
+                }
+            }
+        }
+         
+        return missingParts;
 	}
 
 	@Override
